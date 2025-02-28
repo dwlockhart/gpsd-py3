@@ -107,12 +107,13 @@ class GpsResponse(object):
 
         result.mode = last_tpv['mode']
 
+        result.time = last_tpv['time'] if 'time' in last_tpv else ''
+
         if last_tpv['mode'] >= 2:
             result.lon = last_tpv['lon'] if 'lon' in last_tpv else 0.0
             result.lat = last_tpv['lat'] if 'lat' in last_tpv else 0.0
             result.track = last_tpv['track'] if 'track' in last_tpv else 0
             result.hspeed = last_tpv['speed'] if 'speed' in last_tpv else 0
-            result.time = last_tpv['time'] if 'time' in last_tpv else ''
             result.error = {
                 'c': 0,
                 's': last_tpv['eps'] if 'eps' in last_tpv else 0,
@@ -212,14 +213,16 @@ class GpsResponse(object):
             raise NoFixError("Needs at least 2D fix")
         return "http://www.openstreetmap.org/?mlat={}&mlon={}&zoom=15".format(self.lat, self.lon)
 
-    def get_time(self, local_time=False):
+    def get_time(self, local_time=False, allow_no_fix=False):
         """ Get the GPS time
 
         :type local_time: bool
         :param local_time: Return date in the local timezone instead of UTC
+        :param allow_no_fix: Return date even if no fix has been acquired. The date/time may or may not be present, 
+                             and if it is present there's no guarantee of accuracy. Use with caution.
         :return: datetime.datetime
         """
-        if self.mode < 2:
+        if self.mode < 2 and not allow_no_fix:
             raise NoFixError("Needs at least 2D fix")
         time = datetime.datetime.strptime(self.time, gpsTimeFormat)
 
