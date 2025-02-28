@@ -114,7 +114,6 @@ class GpsResponse(object):
             result.lat = last_tpv['lat'] if 'lat' in last_tpv else 0.0
             result.track = last_tpv['track'] if 'track' in last_tpv else 0
             result.hspeed = last_tpv['speed'] if 'speed' in last_tpv else 0
-            
             result.error = {
                 'c': 0,
                 's': last_tpv['eps'] if 'eps' in last_tpv else 0,
